@@ -1,18 +1,29 @@
-use std::fmt::Debug;
+use crate::lru::Cache;
 
 // 定义节点
-#[derive(Debug, Clone)]
-struct Node<T> where T: Clone + Debug + PartialOrd {
+#[derive(Clone, Debug)]
+struct Node<T> where T: Clone + PartialOrd + PartialEq {
     element: T,
     next: Option<Box<Node<T>>>,
 }
 
-impl<T> Node<T> where T: Clone + Debug + PartialOrd {
+impl<T> Node<T> where T: Clone + PartialOrd + PartialEq {
     fn new(elt: T) -> Self {
         Node {
             element: elt,
             next: None,
         }
+    }
+    // 是否包涵
+    fn contains(&mut self, n: &T) -> bool {
+        if &self.element == n {
+            return true;
+        } else {
+            if let Some(ref mut node) = self.next {
+                return node.contains(n);
+            }
+        }
+        false
     }
     // 返回最后一个节点
     fn last(&mut self) -> &mut Self {
@@ -37,7 +48,7 @@ impl<T> Node<T> where T: Clone + Debug + PartialOrd {
 }
 
 // 合并有序 Node 递归实现
-impl<T> Node<T> where T: Clone + Debug + PartialOrd {
+impl<T> Node<T> where T: Clone + PartialOrd + PartialEq {
     fn merge(n: Option<Box<Node<T>>>, m: Option<Box<Node<T>>>) -> Option<Box<Node<T>>> {
         match (n, m) {
             (Some(x), None) => {
@@ -71,14 +82,14 @@ impl<T> Node<T> where T: Clone + Debug + PartialOrd {
 }
 
 // 单链表 head 头节点 len 长度
-#[derive(Debug, Clone)]
-pub struct Linked<T> where T: Clone + Debug + PartialOrd {
+#[derive(Clone, Debug)]
+pub struct Linked<T> where T: Clone + PartialOrd + PartialEq {
     head: Option<Box<Node<T>>>,
     len: usize,
 }
 
 // Vec => Linked 转换
-impl<T> From<Vec<T>> for Linked<T> where T: Clone + Debug + PartialOrd {
+impl<T> From<Vec<T>> for Linked<T> where T: Clone + PartialOrd + PartialEq {
     fn from(v: Vec<T>) -> Self {
         let mut l = Linked::new();
         for i in v {
@@ -89,19 +100,49 @@ impl<T> From<Vec<T>> for Linked<T> where T: Clone + Debug + PartialOrd {
 }
 
 // Linked => Vec 转换
-impl<T> Into<Vec<T>> for Linked<T> where T: Clone + Debug + PartialOrd {
+impl<T> Into<Vec<T>> for Linked<T> where T: Clone + PartialOrd + PartialEq {
     fn into(mut self) -> Vec<T> {
         let mut v = Vec::new();
         for i in 0..self.len {
             if let Some(n) = self.index(i) {
-                v.push(n);
+                v.push(n.clone());
             }
         }
         v
     }
 }
 
-impl<T> Linked<T> where T: Clone + Debug + PartialOrd {
+// 实现 Cache Trait 作为 LRU 得存储结构支持
+impl<T> Cache<T> for Linked<T> where T: Clone + PartialOrd + PartialEq {
+    fn new() -> Self where Self: Sized {
+        Linked {
+            head: None,
+            len: 0,
+        }
+    }
+
+    fn contains(&mut self, n: &T) -> bool {
+        self.contains(n)
+    }
+
+    fn remove(&mut self, i: usize) -> Option<T> {
+        self.remove(i)
+    }
+
+    fn insert(&mut self, i: usize, n: T) {
+        self.insert(i, n)
+    }
+
+    fn pop(&mut self) -> Option<T> {
+        self.pop()
+    }
+
+    fn index(&mut self, i: usize) -> Option<&T> {
+        self.index(i)
+    }
+}
+
+impl<T> Linked<T> where T: Clone + PartialOrd + PartialEq {
     pub fn new() -> Self {
         Linked {
             head: None,
@@ -165,7 +206,7 @@ impl<T> Linked<T> where T: Clone + Debug + PartialOrd {
         None
     }
     // 索引插入节点
-    pub fn insert(&mut self, i: usize, n: T) -> Option<()> {
+    pub fn insert(&mut self, i: usize, n: T) {
         let mut new = Node::new(n);
         if let Some(ref mut head) = self.head {
             // 索引为 0 相当于链表头插入
@@ -182,8 +223,10 @@ impl<T> Linked<T> where T: Clone + Debug + PartialOrd {
                 }
             }
             self.len += 1;
+        } else {
+            self.head = Some(Box::from(new));
+            self.len += 1;
         }
-        None
     }
     // 末尾删除节点
     pub fn pop(&mut self) -> Option<T> {
@@ -205,12 +248,19 @@ impl<T> Linked<T> where T: Clone + Debug + PartialOrd {
         }
         None
     }
+    // 是否包含
+    pub fn contains(&mut self, n: &T) -> bool {
+        if let Some(ref mut head) = self.head {
+            return head.contains(n);
+        }
+        false
+    }
     // 根据索引下标查找节点
-    pub fn index(&mut self, i: usize) -> Option<T> {
+    pub fn index(&mut self, i: usize) -> Option<&T> {
         if self.len > i {
             if let Some(ref mut head) = self.head {
                 if let Some(elt) = head.search(0, i) {
-                    return Some(elt.element.clone());
+                    return Some(&elt.element);
                 }
             }
         }
@@ -222,7 +272,7 @@ impl<T> Linked<T> where T: Clone + Debug + PartialOrd {
     }
 }
 
-impl<T> Linked<T> where T: Clone + Debug + PartialOrd {
+impl<T> Linked<T> where T: Clone + PartialOrd + PartialEq {
     // 合并有序列表
     pub fn merge_order(n: Linked<T>, m: Linked<T>) -> Option<Linked<T>> {
         if let Some(node) = Node::merge(n.head, m.head) {
