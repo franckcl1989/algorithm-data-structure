@@ -1,4 +1,5 @@
 use crate::lru::Cache;
+use crate::queue::QueueCache;
 
 // 定义节点
 #[derive(Clone, Debug)]
@@ -109,6 +110,24 @@ impl<T> Into<Vec<T>> for Linked<T> where T: Clone + PartialOrd + PartialEq {
             }
         }
         v
+    }
+}
+
+// 实现 Queue 特性
+impl<T> QueueCache<T> for Linked<T> where T: Clone + PartialOrd + PartialEq {
+    fn new() -> Self {
+        Linked {
+            head: None,
+            len: 0,
+        }
+    }
+
+    fn enqueue(&mut self, n: T) {
+        self.push(n);
+    }
+
+    fn dequeue(&mut self) -> Option<T> {
+        self.remove(0)
     }
 }
 

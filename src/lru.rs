@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::ops::Index;
+use crate::queue::QueueCache;
 
 // 基于动态数组实现LRU
 // 定义缓存 Trait
@@ -17,6 +18,27 @@ pub trait Cache<T> {
 #[derive(Clone, Debug)]
 pub struct List<T> where T: Clone + PartialOrd + PartialEq {
     inner: Vec<T>,
+}
+
+// 实现 Queue 特性
+impl<T> QueueCache<T> for List<T> where T: Clone + PartialOrd + PartialEq {
+    fn new() -> Self {
+        List {
+            inner: Vec::new()
+        }
+    }
+
+    fn enqueue(&mut self, n: T) {
+        self.inner.push(n);
+    }
+
+    fn dequeue(&mut self) -> Option<T> {
+        if self.inner.len() == 0 {
+            None
+        } else {
+            self.remove(0)
+        }
+    }
 }
 
 // Vec => List 转换

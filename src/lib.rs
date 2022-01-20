@@ -1,13 +1,15 @@
 mod lru;
 mod linked;
 mod stack;
+mod queue;
 
 #[cfg(test)]
 mod tests {
     use std::ops::Index;
-    use crate::lru::Cache;
+    use crate::lru::{Cache, List};
     use crate::linked::Linked;
     use crate::lru::Lru;
+    use crate::queue::{ArrayQueue, Queue};
     use super::{lru, linked};
     use crate::stack;
     use crate::stack::Stack;
@@ -184,5 +186,52 @@ mod tests {
         assert_eq!(Some(3 + 5 * 8 - 6), stack::calculate(s));
         let s = "9 / 5 + 3 - 1 + 3 * 2 - 1";
         assert_eq!(Some(9 / 5 + 3 - 1 + 3 * 2 - 1), stack::calculate(s))
+    }
+
+    // 队列
+    #[test]
+    fn queue() {
+        // 动态数组实现
+        let mut v: Queue<List<i32>, i32> = Queue::new(3);
+        v.enqueue(1);
+        v.enqueue(2);
+        v.enqueue(3);
+        assert_eq!(false, v.enqueue(4));
+        assert_eq!(v.dequeue(), Some(1));
+        assert_eq!(v.dequeue(), Some(2));
+        assert_eq!(v.dequeue(), Some(3));
+        assert_eq!(v.dequeue(), None);
+        // 链表数组实现
+        let mut v: Queue<Linked<i32>, i32> = Queue::new(3);
+        v.enqueue(1);
+        v.enqueue(2);
+        v.enqueue(3);
+        assert_eq!(false, v.enqueue(4));
+        assert_eq!(v.dequeue(), Some(1));
+        assert_eq!(v.dequeue(), Some(2));
+        assert_eq!(v.dequeue(), Some(3));
+        assert_eq!(v.dequeue(), None);
+        // 数组实现
+        let mut v: ArrayQueue<i32> = ArrayQueue::new();
+        v.enqueue(1);
+        v.enqueue(2);
+        v.enqueue(3);
+        v.enqueue(4);
+        v.enqueue(5);
+        v.enqueue(6);
+        v.enqueue(7);
+        v.enqueue(8);
+        v.enqueue(9);
+        assert_eq!(false, v.enqueue(10));
+        assert_eq!(v.dequeue(), Some(1));
+        assert_eq!(v.dequeue(), Some(2));
+        assert_eq!(v.dequeue(), Some(3));
+        assert_eq!(v.dequeue(), Some(4));
+        assert_eq!(v.dequeue(), Some(5));
+        assert_eq!(v.dequeue(), Some(6));
+        assert_eq!(v.dequeue(), Some(7));
+        assert_eq!(v.dequeue(), Some(8));
+        assert_eq!(v.dequeue(), Some(9));
+        assert_eq!(v.dequeue(), None);
     }
 }
