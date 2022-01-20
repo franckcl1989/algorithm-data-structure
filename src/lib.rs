@@ -2,9 +2,11 @@ mod lru;
 mod linked;
 mod stack;
 mod queue;
+mod recursion;
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
     use std::ops::Index;
     use crate::lru::{Cache, List};
     use crate::linked::Linked;
@@ -13,6 +15,7 @@ mod tests {
     use super::{lru, linked};
     use crate::stack;
     use crate::stack::Stack;
+    use crate::recursion;
 
     #[test]
     // 基于动态数组/单链表实现LRU
@@ -233,5 +236,18 @@ mod tests {
         assert_eq!(v.dequeue(), Some(8));
         assert_eq!(v.dequeue(), Some(9));
         assert_eq!(v.dequeue(), None);
+    }
+
+    // 递归
+    #[test]
+    fn recursion() {
+        // 座位问题 f(n) = f(n-1) + 1 f(1) = 1 体现逻辑 实际 fn(n) = n
+        assert_eq!(5, recursion::f(5));
+        assert_eq!(5, recursion::find_seat(5));
+        // 爬楼梯问题
+        assert_eq!(recursion::climbing_stairs_v1(13), 377);
+        let mut h: HashMap<u32, u32> = HashMap::new();
+        assert_eq!(recursion::climbing_stairs_v2(13, &mut h), 377);
+        assert_eq!(recursion::climbing_stairs_v3(13), 377);
     }
 }
