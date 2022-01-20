@@ -1,5 +1,6 @@
 mod lru;
 mod linked;
+mod stack;
 
 #[cfg(test)]
 mod tests {
@@ -8,6 +9,8 @@ mod tests {
     use crate::linked::Linked;
     use crate::lru::Lru;
     use super::{lru, linked};
+    use crate::stack;
+    use crate::stack::Stack;
 
     #[test]
     // 基于动态数组/单链表实现LRU
@@ -128,5 +131,58 @@ mod tests {
         println!("{}", v.contains(&1));
         assert_eq!(true, v.contains(&1));
         assert_eq!(false, v.contains(&0));
+    }
+
+    // 栈 表达式求值/括号匹配/前进后退
+    #[test]
+    fn stack() {
+        // 创建最大容量为 5 的栈
+        let mut s: Stack<i32> = stack::Stack::new(5);
+        // 入栈
+        s.push(1);
+        s.push(2);
+        s.push(3);
+        s.push(4);
+        s.push(5);
+        assert_eq!(5, s.len);
+        assert_eq!(5, s.count);
+        // 出栈
+        assert_eq!(Some(5), s.pop());
+        assert_eq!(Some(4), s.pop());
+        assert_eq!(Some(3), s.pop());
+        assert_eq!(Some(2), s.pop());
+        assert_eq!(Some(1), s.pop());
+        assert_eq!(5, s.len);
+        assert_eq!(0, s.count);
+        // 模拟浏览器 前进后退
+        let mut b = stack::Browser::new();
+        // 浏览网页
+        b.browse(1);
+        b.browse(2);
+        b.browse(3);
+        b.browse(4);
+        b.browse(5);
+        // 后退前进
+        assert_eq!(Some(4), b.backward());
+        assert_eq!(Some(5), b.forward());
+        assert_eq!(Some(4), b.backward());
+        assert_eq!(Some(3), b.backward());
+        assert_eq!(Some(2), b.backward());
+        assert_eq!(Some(3), b.forward());
+        assert_eq!(Some(4), b.forward());
+        // 括号匹配
+        let s = "sdf{123[xcv]zxv(fds)[11{22}3]4}55";
+        assert_eq!(true, stack::brackets_match(s));
+        let s = "[{()}([])]";
+        assert_eq!(true, stack::brackets_match(s));
+        let s = "{sdf[xv}(vxc)zxc]2131";
+        assert_eq!(false, stack::brackets_match(s));
+        let s = "[({)]";
+        assert_eq!(false, stack::brackets_match(s));
+        // 计算表达式
+        let s = "3 + 5 * 8 - 6";
+        assert_eq!(Some(3 + 5 * 8 - 6), stack::calculate(s));
+        let s = "9 / 5 + 3 - 1 + 3 * 2 - 1";
+        assert_eq!(Some(9 / 5 + 3 - 1 + 3 * 2 - 1), stack::calculate(s))
     }
 }
