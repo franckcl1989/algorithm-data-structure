@@ -3,6 +3,7 @@ mod linked;
 mod stack;
 mod queue;
 mod recursion;
+mod sort;
 
 #[cfg(test)]
 mod tests {
@@ -16,6 +17,7 @@ mod tests {
     use crate::stack;
     use crate::stack::Stack;
     use crate::recursion;
+    use crate::sort;
 
     #[test]
     // 基于动态数组/单链表实现LRU
@@ -249,5 +251,22 @@ mod tests {
         let mut h: HashMap<u32, u32> = HashMap::new();
         assert_eq!(recursion::climbing_stairs_v2(13, &mut h), 377);
         assert_eq!(recursion::climbing_stairs_v3(13), 377);
+    }
+
+    // 排序
+    #[test]
+    fn sort() {
+        // 冒泡
+        let mut v = vec![2, 4, 6, 2, 1, 4, 7, 2, 9, 1];
+        sort::bubble(&mut v);
+        assert_eq!(vec![1, 1, 2, 2, 2, 4, 4, 6, 7, 9], v);
+        // 插入
+        let mut v = vec![4, 5, 6, 1, 2, 3];
+        sort::bubble(&mut v);
+        assert_eq!(vec![1, 2, 3, 4, 5, 6], v);
+        // 选择
+        let mut v = vec![4, 5, 6, 1, 2, 3];
+        sort::selection(&mut v);
+        assert_eq!(vec![1, 2, 3, 4, 5, 6], v);
     }
 }
