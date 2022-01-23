@@ -92,6 +92,9 @@ pub fn selection<T>(v: &mut Vec<T>) where T: PartialEq + PartialOrd + Copy {
 // 递推公式：merge_sort(p...r) = merge(merge_sort(p...q),merge_sort(q+1...r))
 // 终止条件：p >= r
 // 排序函数主要是实现递推公式即：排序的结果start...end -> 合并(start...end/前半，start...end/后半)
+// 稳定算法：优先处理前半段
+// 空间复杂度:O(n)
+// 时间复杂度：O(nlogn)
 pub fn merge_sort<T>(v: &mut [T]) where T: PartialEq + PartialOrd + Copy + Debug {
     // 中间位置
     let middle = v.len() / 2;
@@ -147,4 +150,56 @@ pub fn merge<T>(v: &mut [T], n: usize) where T: PartialEq + PartialOrd + Copy + 
     for m in 0..len {
         v[m] = temp[m];
     }
+}
+
+// 快速排序
+// 从数组中选取一个分区点，将小于分区点的数据放置在分区的前半部分，大于分区点的数据放置在后半部分，重复这个过程
+// 递推公式：quick_sort(p...r) = quick_sort(p...q-1),quick_sort(q+1...r))
+// 终止条件：p >= r
+// 排序函数主要是实现递推公式即：排序的结果start...end -> (start...分区点/前半，分区点...end/后半)
+// 不稳定算法：会发生元素顺序交换
+// 空间复杂度:O(1)
+// 时间复杂度：O(nlogn)
+pub fn quick_sort<T>(v: &mut [T]) where T: PartialEq + PartialOrd + Copy + Debug {
+    // 分区没数据长度为0
+    if v.len() == 0 {
+        return;
+    }
+    // 分区点
+    let mut p = v.len() - 1;
+    // 退出条件（无法拆分子问题）
+    if p == 0 {
+        return;
+    }
+    // 分区处理
+    partition(v, &mut p);
+    // 分区前半段
+    quick_sort(&mut v[..p]);
+    // 分区后半段
+    quick_sort(&mut v[p + 1..]);
+}
+
+// 分区处理函数是排序主要逻辑，依次扫描元素与分区进行比较，比分区点小的不做处理比分区大的与分区交换（因为分区用的是最后一个元素）
+pub fn partition<T>(v: &mut [T], p: &mut usize) where T: PartialEq + PartialOrd + Copy + Debug {
+    // 分区点数据
+    let pivot = v[*p];
+    // 指针A下标i
+    let mut i = 0;
+    // 指针B下标j，循环从 0..分区点
+    for j in 0..*p {
+        // 比较指针B与分区点数据，小的话交换A B指针数据并且A指针前进一步
+        // 这相当于将小于分区点的元素放置最左侧
+        // 指针A 相当于临时分区点
+        if v[j] < pivot {
+            let temp = v[j];
+            v[j] = v[i];
+            v[i] = temp;
+            i += 1;
+        }
+    }
+    // 交换指针A 与分区点
+    let temp = v[*p];
+    v[*p] = v[i];
+    v[i] = temp;
+    *p = i;
 }
