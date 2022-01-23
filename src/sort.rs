@@ -17,6 +17,9 @@
 // 1.如果排序中存在相等的元素，经过排序之后相等元素的先后顺序保持不变则为稳定
 // 2.实际业务中排序的不是基础数据类型而是复合数据类型，稳定算法适合类似业务
 
+use std::fmt::Debug;
+use std::ops::Range;
+
 // 冒泡排序
 // 比较相邻两个元素，不满足比较关系进行互换，一次冒泡至少使一个元素移动到应该的位置重复n次完成n个数据的排序
 // 空间复杂度O(1)属于原地排序
@@ -78,5 +81,70 @@ pub fn selection<T>(v: &mut Vec<T>) where T: PartialEq + PartialOrd + Copy {
         let temp = v[i];
         v[i] = v[min];
         v[min] = temp;
+    }
+}
+
+// 归并排序、快速排序适合大规模数据排序相交冒泡、插入、选择更常用，归并与快排都用到了分治思想
+// 归并排序
+// 将数组从中间分成前后两部分对前后两部分分别进行排序，再将排序好的部分合并在一起
+// 归并排序使用分治思想将一个大问题分解为小的子问题解决，分治是处理思想、递归是编程技巧
+//         给下标从p到r数组排序 子问题 q = (p + r)/2 中间位置
+// 递推公式：merge_sort(p...r) = merge(merge_sort(p...q),merge_sort(q+1...r))
+// 终止条件：p >= r
+// 排序函数主要是实现递推公式即：排序的结果start...end -> 合并(start...end/前半，start...end/后半)
+pub fn merge_sort<T>(v: &mut [T]) where T: PartialEq + PartialOrd + Copy + Debug {
+    // 中间位置
+    let middle = v.len() / 2;
+    // 退出条件（无法拆分子问题）
+    if middle == 0 {
+        return;
+    }
+    // p...q
+    merge_sort(&mut v[..middle]);
+    // q + 1...r
+    merge_sort(&mut v[middle..]);
+    // 合并
+    merge(v, middle);
+}
+
+// 合并函数是排序主要逻辑，比较元素大小push临时数组、扫描剩余元素push临时数组，临时数组复制给原数组
+pub fn merge<T>(v: &mut [T], n: usize) where T: PartialEq + PartialOrd + Copy + Debug {
+    let len = v.len();
+    // 申请空间长度一致的临时数组
+    let mut temp: Vec<T> = Vec::with_capacity(v.len());
+    // 前半区间下标（从0开始）
+    let mut i = 0;
+    // 后半区间下标（从中间位置开始）
+    let mut j = n;
+    // 循环比较
+    for _ in 0..len {
+        // 前半或者后半区间元素扫描到退出循环
+        if i == n || j == len {
+            break;
+        }
+        // 前半后半依次比较，小的存入临时数组，下标前进一位
+        if v[i] > v[j] {
+            temp.push(v[j]);
+            j += 1;
+        } else {
+            temp.push(v[i]);
+            i += 1;
+        }
+    }
+    // 扫描前半剩余元素
+    if i < n {
+        for x in i..n {
+            temp.push(v[x]);
+        }
+    }
+    // 扫描后半剩余元素
+    if j < len {
+        for x in j..len {
+            temp.push(v[x]);
+        }
+    }
+    // 将临时数组的数据依次写入
+    for m in 0..len {
+        v[m] = temp[m];
     }
 }

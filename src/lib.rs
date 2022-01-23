@@ -268,5 +268,8 @@ mod tests {
         let mut v = vec![4, 5, 6, 1, 2, 3];
         sort::selection(&mut v);
         assert_eq!(vec![1, 2, 3, 4, 5, 6], v);
+        let mut v = vec![4, 5, 6, 7, 1, 2, 1, 5, 3, 9, 8];
+        sort::merge_sort(&mut v[..]);
+        assert_eq!(vec![1, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9], v);
     }
 }
