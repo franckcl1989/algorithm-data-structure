@@ -297,7 +297,15 @@ mod tests {
     // 二分查找
     #[test]
     fn binary_search() {
-        let v = vec![9, 7, 5, 3, 1, 2, 4, 6, 8];
-        println!("{:?}", binary_search::binary_search(&v, 1));
+        let v = vec![1, 2, 3, 4, 5, 6, 7, 8, 9];
+        println!("{:?}", binary_search::binary_search(&v, 7));
+        let v = vec![1, 2, 3, 4, 5, 5, 6, 7, 8, 9];
+        println!("{:?}", binary_search::binary_search_v1(&v, 5));
+        let v = vec![1, 2, 3, 4, 5, 5, 6, 7, 8, 9];
+        println!("{:?}", binary_search::binary_search_v2(&v, 5));
+        let v = vec![1, 2, 3, 4, 5, 7, 8, 9];
+        println!("{:?}", binary_search::binary_search_v3(&v, 6));
+        let v = vec![1, 2, 3, 4, 5, 7, 8, 9];
+        println!("{:?}", binary_search::binary_search_v4(&v, 6));
     }
 }
