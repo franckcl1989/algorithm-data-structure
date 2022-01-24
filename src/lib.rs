@@ -9,6 +9,8 @@ mod sort;
 mod tests {
     use std::collections::HashMap;
     use std::ops::Index;
+    use rand;
+    use rand::Rng;
     use crate::lru::{Cache, List};
     use crate::linked::Linked;
     use crate::lru::Lru;
@@ -268,11 +270,25 @@ mod tests {
         let mut v = vec![4, 5, 6, 1, 2, 3];
         sort::selection(&mut v);
         assert_eq!(vec![1, 2, 3, 4, 5, 6], v);
+        // 归并
         let mut v = vec![4, 5, 6, 7, 1, 2, 1, 5, 3, 9, 8];
         sort::merge_sort(&mut v[..]);
         assert_eq!(vec![1, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9], v);
         let mut v = vec![4, 5, 6, 7, 2, 1, 1, 5, 3, 9, 8];
+        // 快排
         sort::quick_sort(&mut v[..]);
         assert_eq!(vec![1, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9], v);
+        // 桶
+        let mut v1 = vec![];
+        let mut rng = rand::thread_rng();
+        for _ in 0..100 {
+            v.push(rng.gen_range(0..100));
+        }
+        let mut v2 = v1.clone();
+        v2.sort();
+        assert_eq!(v2, sort::bucket(v1));
+        // 计数
+        let v = vec![2, 5, 3, 0, 2, 3, 0, 3];
+        assert_eq!(vec![0, 0, 0, 2, 3, 3, 3, 5], sort::count(v));
     }
 }

@@ -17,7 +17,9 @@
 // 1.如果排序中存在相等的元素，经过排序之后相等元素的先后顺序保持不变则为稳定
 // 2.实际业务中排序的不是基础数据类型而是复合数据类型，稳定算法适合类似业务
 
+use std::collections::HashSet;
 use std::fmt::Debug;
+use std::io::Take;
 use std::ops::Range;
 
 // 冒泡排序
@@ -203,3 +205,81 @@ pub fn partition<T>(v: &mut [T], p: &mut usize) where T: PartialEq + PartialOrd 
     v[i] = temp;
     *p = i;
 }
+
+// 桶排序：线性排序、非元素比较排序，适合用于外部排序（即数据存放在磁盘存储）数据量巨大内存有限的情况
+// 将数据分配到有序的桶中，将每个桶数据排序然后合并每个桶
+// 需要数据具备天然区间可以很容易划分桶、桶与桶之间要有天然顺序合并桶不需要再进行排序、数据分布需要比较平均（每个桶）
+pub fn bucket(v: Vec<i32>) -> Vec<i32> {
+    let mut b = vec![vec![], vec![], vec![], vec![], vec![], vec![], vec![], vec![], vec![], vec![]];
+    for i in v {
+        match i {
+            0..=10 => {
+                b[0].push(i);
+            }
+            11..=20 => {
+                b[1].push(i);
+            }
+            21..=30 => {
+                b[2].push(i);
+            }
+            31..=40 => {
+                b[3].push(i);
+            }
+            41..=50 => {
+                b[4].push(i);
+            }
+            51..=60 => {
+                b[5].push(i);
+            }
+            61..=70 => {
+                b[6].push(i);
+            }
+            71..=80 => {
+                b[7].push(i);
+            }
+            81..=90 => {
+                b[8].push(i);
+            }
+            91..=100 => {
+                b[9].push(i);
+            }
+            _ => {}
+        }
+    }
+    for x in b.iter_mut() {
+        quick_sort(&mut x[..]);
+    }
+    let mut v = b[0].clone();
+    for y in 1..b.len() - 1 {
+        v.append(&mut b[y])
+    }
+    v
+}
+
+// 计数排序
+// 计数排序属于桶排序的一种特殊情况，当所处理的数据范围不大的时候可以直接按照数据规模分桶，省掉了桶内排序的时间
+pub fn count(v: Vec<i32>) -> Vec<i32> {
+    let len = v.len();
+    // a 保存分数对应考生个数，下标为分数 值为个数
+    let mut c = vec![0; 6];
+    for i in v.clone() {
+        c[i as usize] += 1;
+    }
+    // 依次累计每个元素，此时下标对应分数 元素对应小于等于下标（分数）的个数
+    for i in 1..c.len() {
+        c[i] = c[i - 1] + c[i]
+    }
+    let mut r = vec![0; len];
+    // 循环 v 元素，从 c 中获取下标为 v 的元素，c[v[i]] 代表小于等于 v 的数量（则r[x] = r[c[v[i]] - 1]]）
+    for i in 0..len - 1 {
+        let i = len - 1 - i;
+        let index = (c[v[i] as usize] - 1) as usize;
+        r[index] = v[i];
+        c[v[i] as usize] -= 1;
+    }
+    r
+}
+
+// 基数排序
+// 可以独立分成'位'按位比较、位直接有递进关系，位的数据范围要小可以使用线性算法排序
+// 借助稳定排序算法，基数排序适合手机号字符串之类的排序，如果遇到数据非等长需要按位补0
