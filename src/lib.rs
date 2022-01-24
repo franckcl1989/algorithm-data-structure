@@ -4,6 +4,7 @@ mod stack;
 mod queue;
 mod recursion;
 mod sort;
+mod binary_search;
 
 #[cfg(test)]
 mod tests {
@@ -20,6 +21,7 @@ mod tests {
     use crate::stack::Stack;
     use crate::recursion;
     use crate::sort;
+    use crate::binary_search;
 
     #[test]
     // 基于动态数组/单链表实现LRU
@@ -290,5 +292,12 @@ mod tests {
         // 计数
         let v = vec![2, 5, 3, 0, 2, 3, 0, 3];
         assert_eq!(vec![0, 0, 0, 2, 3, 3, 3, 5], sort::count(v));
+    }
+
+    // 二分查找
+    #[test]
+    fn binary_search() {
+        let v = vec![9, 7, 5, 3, 1, 2, 4, 6, 8];
+        println!("{:?}", binary_search::binary_search(&v, 1));
     }
 }
