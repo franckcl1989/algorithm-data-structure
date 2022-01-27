@@ -5,6 +5,7 @@ mod queue;
 mod recursion;
 mod sort;
 mod binary_search;
+mod skip_list;
 
 #[cfg(test)]
 mod tests {
