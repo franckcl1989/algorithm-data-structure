@@ -6,6 +6,7 @@ mod recursion;
 mod sort;
 mod binary_search;
 mod skip_list;
+mod hash_table;
 
 #[cfg(test)]
 mod tests {
@@ -23,6 +24,7 @@ mod tests {
     use crate::recursion;
     use crate::sort;
     use crate::binary_search;
+    use crate::hash_table::HashTable;
 
     #[test]
     // 基于动态数组/单链表实现LRU
@@ -308,5 +310,17 @@ mod tests {
         println!("{:?}", binary_search::binary_search_v3(&v, 6));
         let v = vec![1, 2, 3, 4, 5, 7, 8, 9];
         println!("{:?}", binary_search::binary_search_v4(&v, 6));
+    }
+
+    // 哈希表
+    #[test]
+    fn hash_table() {
+        let mut h = HashTable::new();
+        h.insert("a", "aaa");
+        h.insert("b", "bbb");
+        h.insert("c", "ccc");
+        assert_eq!(Some(&"aaa"), h.get("a"));
+        assert_eq!(Some(&"aaa"), h.get("a"));
+        assert_eq!(Some(&"aaa"), h.get("a"));
     }
 }
