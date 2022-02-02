@@ -7,6 +7,7 @@ mod sort;
 mod binary_search;
 mod skip_list;
 mod hash_table;
+mod binary_tree;
 
 #[cfg(test)]
 mod tests {
@@ -19,7 +20,7 @@ mod tests {
     use crate::lru::Lru;
     use crate::queue::{ArrayQueue, Queue};
     use super::{lru, linked};
-    use crate::stack;
+    use crate::{binary_tree, stack};
     use crate::stack::Stack;
     use crate::recursion;
     use crate::sort;
@@ -322,5 +323,22 @@ mod tests {
         assert_eq!(Some(&"aaa"), h.get("a"));
         assert_eq!(Some(&"aaa"), h.get("a"));
         assert_eq!(Some(&"aaa"), h.get("a"));
+    }
+
+    // 二叉树
+    #[test]
+    fn binary_tree() {
+        let mut t = binary_tree::BinaryTree::new(1);
+        t.root = Some(());
+        t.left = Some(Box::new(binary_tree::BinaryTree::new(2)));
+        t.right = Some(Box::new(binary_tree::BinaryTree::new(3)));
+        t.left.as_mut().unwrap().left = Some(Box::new(binary_tree::BinaryTree::new(4)));
+        t.left.as_mut().unwrap().right = Some(Box::new(binary_tree::BinaryTree::new(5)));
+        t.right.as_mut().unwrap().left = Some(Box::new(binary_tree::BinaryTree::new(6)));
+        t.right.as_mut().unwrap().right = Some(Box::new(binary_tree::BinaryTree::new(7)));
+        println!("{:?}", t);
+        t.pre_order();
+        t.in_order();
+        t.post_order();
     }
 }
