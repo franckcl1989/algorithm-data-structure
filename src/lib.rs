@@ -341,4 +341,17 @@ mod tests {
         t.in_order();
         t.post_order();
     }
+
+    // 二叉查找树
+    #[test]
+    fn binary_search_tree() {
+        let mut t = binary_tree::BinarySearchTree::new();
+        t.push(2);
+        t.push(1);
+        t.push(3);
+        println!("{:?}", t);
+        assert_eq!(Some(&1), t.search(1));
+        assert_eq!(Some(&2), t.search(2));
+        assert_eq!(Some(&3), t.search(3));
+    }
 }

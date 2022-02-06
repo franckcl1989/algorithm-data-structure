@@ -88,3 +88,115 @@ impl<T> BinaryTree<T> where T: Debug {
         println!("{:?}", self.elt);
     }
 }
+
+// 二叉查找树
+// 树中任意一个节点左子树小于节点、右子树大于节点
+type Node<T> = Option<Box<BinarySearchTree<T>>>;
+
+#[derive(Debug, Clone)]
+pub struct BinarySearchTree<T> {
+    elt: Option<T>,
+    left: Node<T>,
+    right: Node<T>,
+}
+
+impl<T> BinarySearchTree<T> where T: Debug + Clone + Ord {
+    // 初始均为None
+    pub fn new() -> Self {
+        BinarySearchTree {
+            elt: None,
+            left: None,
+            right: None,
+        }
+    }
+    // 删除数据
+    fn delete(&mut self, prev: &mut BinarySearchTree<T>, n: T) {
+        match self.elt.clone() {
+            None => {}
+            Some(e) => {
+                // 数据匹配则返回
+                if n == e {
+                    if self.left.is_none() && self.right.is_none() {
+                        prev.left = None;
+                    }
+                    if self.left.is_some() && self.right.is_none() {
+                        prev.left = self.left.clone();
+                    }
+                    if self.right.is_some() && self.left.is_none() {
+                        prev.right = self.right.clone();
+                    }
+                    if self.left.is_some() && self.right.is_some() {
+                        let mut next = self.right.clone();
+                        while next.is_some() {
+                            next = next.take();
+                        }
+                        prev.left = next;
+                        next = None;
+                    }
+                } else {
+                    // 不匹配则根据大小寻找下一个节点
+                    let next = if n < e { &mut self.left } else { &mut self.right }.take();
+                    match next {
+                        None => {}
+                        // 节点不为None递归调用
+                        Some(mut node) => {
+                            node.delete(self, n)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // 查找数据
+    pub fn search(&mut self, n: T) -> Option<&T> {
+        match &self.elt {
+            None => {
+                None
+            }
+            Some(e) => {
+                // 数据匹配则返回
+                if n == *e {
+                    Some(e)
+                } else {
+                    // 不匹配则根据大小寻找下一个节点
+                    let next = if n < *e { &mut self.left } else { &mut self.right };
+                    match next {
+                        None => {
+                            None
+                        }
+                        // 节点不为None递归调用
+                        Some(node) => {
+                            node.search(n)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // 插入数据
+    pub fn push(&mut self, n: T) {
+        match &self.elt {
+            None => {
+                // 头节点为None直接插入
+                self.elt = Some(n);
+            }
+            // 否则根据大小继续寻找插入点
+            Some(e) => {
+                // 根据大小判断插入子节点
+                let next = if n < *e { &mut self.left } else { &mut self.right };
+                match next {
+                    // 子节点为None插入
+                    None => {
+                        let mut node = BinarySearchTree::new();
+                        node.push(n);
+                        *next = Some(Box::new(node));
+                    }
+                    // 不为None递归调用
+                    Some(ref mut node) => {
+                        node.push(n);
+                    }
+                }
+            }
+        }
+    }
+}
