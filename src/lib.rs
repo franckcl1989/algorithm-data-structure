@@ -8,6 +8,7 @@ mod binary_search;
 mod skip_list;
 mod hash_table;
 mod binary_tree;
+mod heap;
 
 #[cfg(test)]
 mod tests {
@@ -26,6 +27,7 @@ mod tests {
     use crate::sort;
     use crate::binary_search;
     use crate::hash_table::HashTable;
+    use crate::heap;
 
     #[test]
     // 基于动态数组/单链表实现LRU
@@ -353,5 +355,23 @@ mod tests {
         assert_eq!(Some(&1), t.search(1));
         assert_eq!(Some(&2), t.search(2));
         assert_eq!(Some(&3), t.search(3));
+    }
+
+    // 堆
+    #[test]
+    fn heap() {
+        let mut h: heap::Heap<i32> = heap::Heap::new(15);
+        h.insert(1);
+        h.insert(3);
+        h.insert(5);
+        h.insert(7);
+        h.insert(9);
+        h.insert(8);
+        h.insert(6);
+        h.insert(4);
+        h.insert(2);
+        println!("{:?}", h);
+        h.remove();
+        println!("{:?}", h);
     }
 }
