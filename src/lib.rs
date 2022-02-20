@@ -9,6 +9,7 @@ mod skip_list;
 mod hash_table;
 mod binary_tree;
 mod heap;
+mod graph;
 
 #[cfg(test)]
 mod tests {
